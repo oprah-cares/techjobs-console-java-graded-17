@@ -5,10 +5,7 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by LaunchCode
@@ -71,21 +68,19 @@ public class JobData {
      * @return List of all jobs matching the criteria
      */
     public static ArrayList<HashMap<String, String>> findByColumnAndValue(String column, String value) {
-
-        // load data, if not already loaded
         loadData();
+// ** fixed so that column search now ignores case. ** //
 
         ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
-
         for (HashMap<String, String> row : allJobs) {
-
-            String aValue = row.get(column);
-
-            if (aValue.contains(value)) {
-                jobs.add(row);
+            for (Map.Entry <String, String> entry : row.entrySet()) {
+                String columnValue = entry.getValue();
+                if (entry.getKey().equalsIgnoreCase(column) && columnValue.toLowerCase().contains(value.toLowerCase())) {
+                    jobs.add(row);
+                    break;
+                }
             }
         }
-
         return jobs;
     }
 
@@ -101,7 +96,19 @@ public class JobData {
         loadData();
 
         // TODO - implement this method
-        return null;
+
+        LinkedHashSet<HashMap<String, String>> jobs = new LinkedHashSet<>();
+        for (HashMap<String, String> job : allJobs) {
+            for (String fieldValue : job.values()) {
+                if (fieldValue.toLowerCase().contains(value.toLowerCase())) {
+                    jobs.add(job);
+                    break;
+                }
+            }
+        }
+
+
+        return new ArrayList <> (jobs);
     }
 
     /**
